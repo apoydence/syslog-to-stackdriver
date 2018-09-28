@@ -1,6 +1,8 @@
 package conversion
 
 import (
+	"strings"
+
 	"cloud.google.com/go/logging"
 	"code.cloudfoundry.org/rfc5424"
 )
@@ -19,7 +21,7 @@ func Convert(data []byte) (logging.Entry, error) {
 			"app_name":   msg.AppName,
 			"process_id": msg.ProcessID,
 			"message_id": msg.MessageID,
-			"message":    string(msg.Message),
+			"message":    strings.TrimSpace(string(msg.Message)),
 		},
 	}, nil
 }

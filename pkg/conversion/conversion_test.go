@@ -19,7 +19,9 @@ func TestConversion(t *testing.T) {
 		AppName:   "some-app",
 		ProcessID: "some-process",
 		MessageID: "some-message-id",
-		Message:   []byte("some-message"),
+
+		// Trim whitespace
+		Message: []byte(" some-message\n"),
 	}
 
 	data, err := msg.MarshalBinary()
