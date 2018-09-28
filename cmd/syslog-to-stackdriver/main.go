@@ -11,6 +11,7 @@ import (
 	envstruct "code.cloudfoundry.org/go-envstruct"
 	"github.com/apoydence/syslog-to-stackdriver/pkg/conversion"
 	"github.com/apoydence/syslog-to-stackdriver/pkg/web"
+	"google.golang.org/appengine"
 )
 
 func main() {
@@ -23,29 +24,55 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	client, err := logging.NewClient(ctx, cfg.ProjectID)
-	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
-	}
+	handler := buildHandler(ctx, cfg, log)
 
-	logger := client.Logger(cfg.LogID)
-	defer func() {
-		if err := client.Close(); err != nil {
-			log.Fatalf("Failed to close client: %v", err)
+	if !cfg.AppEngine {
+		if err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), handler); err != nil {
+			log.Fatal(err)
 		}
-	}()
-
-	handler := web.NewDrain(conversion.Convert, logger)
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), handler); err != nil {
-		log.Fatal(err)
 	}
+
+	http.Handle("/", handler)
+	appengine.Main()
+}
+
+func buildHandler(ctx context.Context, cfg Config, log *log.Logger) http.Handler {
+	if !cfg.AppEngine {
+		client, err := logging.NewClient(ctx, cfg.ProjectID)
+		if err != nil {
+			log.Fatalf("Failed to create client: %v", err)
+		}
+
+		logger := client.Logger(cfg.LogID)
+
+		return web.NewDrain(conversion.Convert, logger)
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := appengine.NewContext(r)
+		client, err := logging.NewClient(ctx, appengine.AppID(ctx))
+		if err != nil {
+			log.Fatalf("Failed to create client: %v", err)
+		}
+
+		defer func() {
+			if err := client.Close(); err != nil {
+				log.Fatalf("Failed to close client: %v", err)
+			}
+		}()
+
+		logger := client.Logger(cfg.LogID)
+
+		web.NewDrain(conversion.Convert, logger).ServeHTTP(w, r)
+	})
 }
 
 type Config struct {
 	Port                   int    `env:"PORT, report"`
-	ProjectID              string `env:"PROJECT_ID, required, report"`
+	ProjectID              string `env:"PROJECT_ID, report"`
 	LogID                  string `env:"LOG_ID, report"`
-	GoogleApplicationCreds string `env:"GOOGLE_APPLICATION_CREDENTIALS, required"`
+	GoogleApplicationCreds string `env:"GOOGLE_APPLICATION_CREDENTIALS"`
+	AppEngine              bool   `env:"APP_ENGINE"`
 }
 
 func LoadConfig(log *log.Logger) Config {
@@ -56,6 +83,10 @@ func LoadConfig(log *log.Logger) Config {
 
 	if err := envstruct.Load(&cfg); err != nil {
 		log.Fatal(err)
+	}
+
+	if cfg.ProjectID == "" && !cfg.AppEngine {
+		log.Fatal("missing PROJECT_ID")
 	}
 
 	envstruct.WriteReport(&cfg)

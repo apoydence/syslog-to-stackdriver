@@ -12,7 +12,7 @@ creds=""
 
 function print_usage {
     echo "Usage: $0 [a:p:l:c:h]"
-    echo " -a application name              - The given name (and route) for CF-FaaS."
+    echo " -a application name              - The given name (and route) for syslog-to-stackdriver."
     echo " -p project ID (REQUIRED)         - The Google Project ID."
     echo " -c Google Credentials (REQUIRED) - The path to the Google Application Credentials"
     echo " -l Log ID                        - The Log ID (defaults to syslog)."
