@@ -6,7 +6,7 @@ import (
 
 	"cloud.google.com/go/logging"
 	"code.cloudfoundry.org/rfc5424"
-	"github.com/apoydence/syslog-to-stackdriver/internal/conversion"
+	"github.com/apoydence/syslog-to-stackdriver/pkg/conversion"
 )
 
 func TestConversion(t *testing.T) {

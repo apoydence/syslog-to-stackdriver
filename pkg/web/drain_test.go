@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/logging"
-	"github.com/apoydence/syslog-to-stackdriver/internal/web"
+	"github.com/apoydence/syslog-to-stackdriver/pkg/web"
 )
 
 func TestDrain(t *testing.T) {

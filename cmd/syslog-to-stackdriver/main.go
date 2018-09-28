@@ -1,7 +1,7 @@
-// Sample logging-quickstart writes a log entry to Stackdriver Logging.
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,9 +9,8 @@ import (
 
 	"cloud.google.com/go/logging"
 	envstruct "code.cloudfoundry.org/go-envstruct"
-	"github.com/apoydence/syslog-to-stackdriver/internal/conversion"
-	"github.com/apoydence/syslog-to-stackdriver/internal/web"
-	"golang.org/x/net/context"
+	"github.com/apoydence/syslog-to-stackdriver/pkg/conversion"
+	"github.com/apoydence/syslog-to-stackdriver/pkg/web"
 )
 
 func main() {
@@ -24,7 +23,6 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// Creates a client.
 	client, err := logging.NewClient(ctx, cfg.ProjectID)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
