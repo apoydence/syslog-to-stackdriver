@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"cloud.google.com/go/logging"
 	envstruct "code.cloudfoundry.org/go-envstruct"
@@ -43,9 +44,10 @@ func buildHandler(ctx context.Context, cfg Config, log *log.Logger) http.Handler
 			log.Fatalf("Failed to create client: %v", err)
 		}
 
-		logger := client.Logger(cfg.LogID)
-
-		return web.NewDrain(conversion.Convert, logger)
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			logger := client.Logger(getLogID(cfg, r.URL.Path))
+			web.NewDrain(conversion.Convert, logger).ServeHTTP(w, r)
+		})
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -61,10 +63,19 @@ func buildHandler(ctx context.Context, cfg Config, log *log.Logger) http.Handler
 			}
 		}()
 
-		logger := client.Logger(cfg.LogID)
+		logger := client.Logger(getLogID(cfg, r.URL.Path))
 
 		web.NewDrain(conversion.Convert, logger).ServeHTTP(w, r)
 	})
+}
+
+func getLogID(cfg Config, path string) string {
+	split := strings.Split(path, "/")
+	if len(split) == 0 || split[len(split)-1] == "" {
+		return cfg.LogID
+	}
+
+	return split[len(split)-1]
 }
 
 type Config struct {
