@@ -27,7 +27,7 @@ func main() {
 
 	handler := buildHandler(ctx, cfg, log)
 
-	if !cfg.AppEngine {
+	if cfg.NotAppEngine {
 		if err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), handler); err != nil {
 			log.Fatal(err)
 		}
@@ -38,7 +38,7 @@ func main() {
 }
 
 func buildHandler(ctx context.Context, cfg Config, log *log.Logger) http.Handler {
-	if !cfg.AppEngine {
+	if cfg.NotAppEngine {
 		client, err := logging.NewClient(ctx, cfg.ProjectID)
 		if err != nil {
 			log.Fatalf("Failed to create client: %v", err)
@@ -83,7 +83,7 @@ type Config struct {
 	ProjectID              string `env:"PROJECT_ID, report"`
 	LogID                  string `env:"LOG_ID, report"`
 	GoogleApplicationCreds string `env:"GOOGLE_APPLICATION_CREDENTIALS"`
-	AppEngine              bool   `env:"APP_ENGINE"`
+	NotAppEngine           bool   `env:"NOT_APP_ENGINE"`
 }
 
 func LoadConfig(log *log.Logger) Config {
@@ -96,7 +96,7 @@ func LoadConfig(log *log.Logger) Config {
 		log.Fatal(err)
 	}
 
-	if cfg.ProjectID == "" && !cfg.AppEngine {
+	if cfg.ProjectID == "" && cfg.NotAppEngine {
 		log.Fatal("missing PROJECT_ID")
 	}
 

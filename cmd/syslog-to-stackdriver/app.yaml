@@ -3,9 +3,6 @@ api_version: go1
 
 service: syslogtostackdriver
 
-env_variables:
-  APP_ENGINE: "true"
-
 handlers:
 - url: /.*
   script: _go_app

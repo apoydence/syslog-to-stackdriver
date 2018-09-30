@@ -84,6 +84,7 @@ fi
 echo "configuring $app_name..."
 cf set-env $app_name PROJECT_ID "$project_id" &> /dev/null || fail "failed to set PROJECT_ID"
 cf set-env $app_name GOOGLE_APPLICATION_CREDENTIALS "$(basename $creds)" &> /dev/null || fail "failed to set GOOGLE_APPLICATION_CREDENTIALS"
+cf set-env $app_name NOT_APP_ENGINE "true" &> /dev/null || fail "failed to set NOT_APP_ENGINE"
 
 if [ ! -z "$log_id" ]; then
     cf set-env $app_name LOG_ID "$log_id" &> /dev/null || fail "failed to set LOG_ID"
