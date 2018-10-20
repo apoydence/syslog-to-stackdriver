@@ -18,7 +18,7 @@ function print_usage {
     echo " -l Log ID                        - The Log ID (defaults to syslog)."
     echo " -h help                          - Shows this usage."
     echo
-    echo "More information available at https://github.com/apoydence/syslog-to-stackdriver"
+    echo "More information available at https://github.com/poy/syslog-to-stackdriver"
 }
 
 function abs_path {

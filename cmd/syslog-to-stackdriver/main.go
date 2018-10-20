@@ -10,8 +10,8 @@ import (
 
 	"cloud.google.com/go/logging"
 	envstruct "code.cloudfoundry.org/go-envstruct"
-	"github.com/apoydence/syslog-to-stackdriver/pkg/conversion"
-	"github.com/apoydence/syslog-to-stackdriver/pkg/web"
+	"github.com/poy/syslog-to-stackdriver/pkg/conversion"
+	"github.com/poy/syslog-to-stackdriver/pkg/web"
 	"google.golang.org/appengine"
 )
 

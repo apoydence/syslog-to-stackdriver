@@ -6,4 +6,4 @@ Stackdriver has a concept called `LogID`. It is a way to logically organize logs
 
 ### Deploying
 
-syslog-to-stackdriver supports both Cloud Foundry and App Engine (standard environment) deploys. There is a script for both in the [scripts](https://github.com/apoydence/syslog-to-stackdriver/tree/master/scripts) directory. The App Engine method is preferred as it includes auto scaling and requires less configuration.
+syslog-to-stackdriver supports both Cloud Foundry and App Engine (standard environment) deploys. There is a script for both in the [scripts](https://github.com/poy/syslog-to-stackdriver/tree/master/scripts) directory. The App Engine method is preferred as it includes auto scaling and requires less configuration.
